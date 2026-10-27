@@ -8,6 +8,7 @@ const doorButton = document.querySelector('#door-toggle');
 const doorStatus = document.querySelector('.door-status');
 const scrollLabel = document.querySelector('#scroll-label');
 const section = document.querySelector('#seasons');
+const seasonJourney = document.querySelector('#season-journey');
 const scene = document.querySelector('#house-scene');
 const pauseButton = document.querySelector('#pause-scene');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -15,8 +16,14 @@ let paused = reducedMotion.matches;
 let doorProgress = 0;
 let doorStart = 0;
 let doorEnd = 1;
-let doorFrame = 0;
+let scrollFrame = 0;
 let doorEndpoint = '';
+let scrollSeasons = false;
+let seasonStart = 0;
+let seasonEnd = 1;
+let seasonProgress = 0;
+let seasonMix = 0;
+let sceneVisible = false;
 
 function renderDoors(progress) {
   doorProgress = Math.min(1, Math.max(0, progress));
@@ -41,28 +48,49 @@ function measureDoorJourney() {
   doorEnd = top + journey.offsetHeight - hero.offsetHeight;
 }
 
-function updateDoorsFromScroll() {
-  doorFrame = 0;
-  if (!reducedMotion.matches) renderDoors((window.scrollY - doorStart) / Math.max(1, doorEnd - doorStart));
+function updateScenesFromScroll() {
+  scrollFrame = 0;
+  if (reducedMotion.matches) return;
+  renderDoors((window.scrollY - doorStart) / Math.max(1, doorEnd - doorStart));
+  if (scrollSeasons) renderSeasonProgress((window.scrollY - seasonStart) / Math.max(1, seasonEnd - seasonStart));
 }
 
-function queueDoorUpdate() {
-  if (!doorFrame && !reducedMotion.matches) doorFrame = requestAnimationFrame(updateDoorsFromScroll);
+function queueScrollUpdate() {
+  if (!scrollFrame && !reducedMotion.matches) scrollFrame = requestAnimationFrame(updateScenesFromScroll);
 }
 
-function configureDoors() {
+function configureScenes(preservePosition = false) {
+  const wasInSeason = scrollSeasons && window.scrollY >= seasonStart && window.scrollY <= seasonEnd;
+  const previousProgress = seasonProgress;
   document.documentElement.classList.toggle('scroll-doors', !reducedMotion.matches);
+  document.documentElement.classList.toggle('scroll-seasons', !reducedMotion.matches);
+  seasonJourney.style.height = '';
+  // Keep all prose reachable when a short viewport cannot contain the pinned scene.
+  scrollSeasons = !reducedMotion.matches && section.offsetHeight <= window.innerHeight + 1;
+  document.documentElement.classList.toggle('scroll-seasons', scrollSeasons);
+  if (scrollSeasons) seasonJourney.style.height = `${section.offsetHeight + window.innerHeight * 1.6}px`;
+  seasonStart = seasonJourney.getBoundingClientRect().top + window.scrollY;
+  seasonEnd = seasonStart + seasonJourney.offsetHeight - section.offsetHeight;
+  document.querySelector('#season-scroll-cue').textContent = scrollSeasons ? 'Scroll from summer into winter.' : 'Choose a season. Watch the house change.';
+  if (preservePosition && wasInSeason) {
+    window.scrollTo({ top: scrollSeasons ? seasonStart + previousProgress * (seasonEnd - seasonStart) : seasonStart, behavior: 'instant' });
+  }
+  if (!scrollSeasons) {
+    seasonMix = Number(section.dataset.season === 'winter');
+    section.style.setProperty('--season-copy-opacity', 1);
+    syncScene();
+  }
   if (reducedMotion.matches) renderDoors(doorProgress >= .5 ? 1 : 0);
-  else { measureDoorJourney(); updateDoorsFromScroll(); }
+  else { measureDoorJourney(); updateScenesFromScroll(); }
 }
 
 doorButton.addEventListener('click', event => {
   if (reducedMotion.matches) renderDoors(doorProgress >= .98 ? 0 : 1);
   else window.scrollTo({ top: doorProgress >= .98 ? doorStart : doorEnd, behavior: event.detail === 0 ? 'auto' : 'smooth' });
 });
-window.addEventListener('scroll', queueDoorUpdate, { passive: true });
-window.addEventListener('resize', () => { if (!reducedMotion.matches) { measureDoorJourney(); queueDoorUpdate(); } });
-window.addEventListener('pageshow', configureDoors);
+window.addEventListener('scroll', queueScrollUpdate, { passive: true });
+window.addEventListener('resize', () => configureScenes(true));
+window.addEventListener('pageshow', () => configureScenes());
 
 const seasons = {
   summer: {
@@ -85,7 +113,10 @@ function syncScene() {
   const root = scene.contentDocument?.documentElement;
   if (root?.tagName.toLowerCase() === 'svg') {
     root.dataset.season = section.dataset.season;
-    root.dataset.paused = String(paused || reducedMotion.matches);
+    root.dataset.paused = String(paused || reducedMotion.matches || document.hidden || !sceneVisible);
+    root.dataset.scroll = String(scrollSeasons);
+    root.style.setProperty('--summer-opacity', 1 - seasonMix);
+    root.style.setProperty('--winter-opacity', seasonMix);
   }
 }
 
@@ -108,11 +139,31 @@ function setSeason(season) {
   document.querySelector('#season-detail').textContent = copy.detail;
   document.querySelector('#season-feeling').textContent = copy.feeling;
   document.querySelector('#scene-caption').textContent = copy.caption;
+}
+
+function renderSeasonProgress(progress) {
+  seasonProgress = Math.min(1, Math.max(0, progress));
+  const blend = Math.min(1, Math.max(0, (seasonProgress - .2) / .6));
+  seasonMix = blend * blend * (3 - 2 * blend);
+  section.style.setProperty('--season-progress', seasonMix);
+  section.style.setProperty('--summer-opacity', 1 - seasonMix);
+  section.style.setProperty('--winter-opacity', seasonMix);
+  section.style.setProperty('--season-copy-opacity', Math.min(1, Math.abs(seasonMix - .5) * 4));
+  const season = seasonMix < .5 ? 'summer' : 'winter';
+  if (section.dataset.season !== season) setSeason(season);
   syncScene();
 }
 
 document.querySelectorAll('.season-switch button').forEach(button => {
-  button.addEventListener('click', () => setSeason(button.dataset.season));
+  button.addEventListener('click', event => {
+    if (scrollSeasons) {
+      window.scrollTo({ top: button.dataset.season === 'winter' ? seasonEnd : seasonStart, behavior: event.detail === 0 ? 'instant' : 'smooth' });
+    } else {
+      seasonMix = Number(button.dataset.season === 'winter');
+      setSeason(button.dataset.season);
+      syncScene();
+    }
+  });
 });
 
 function updatePauseControl() {
@@ -124,9 +175,11 @@ function updatePauseControl() {
 }
 
 pauseButton.addEventListener('click', () => { paused = !paused; updatePauseControl(); });
-reducedMotion.addEventListener('change', () => { paused = reducedMotion.matches; updatePauseControl(); configureDoors(); });
+reducedMotion.addEventListener('change', () => { paused = reducedMotion.matches; updatePauseControl(); configureScenes(true); });
 scene.addEventListener('load', syncScene);
 scene.addEventListener('error', () => { document.querySelector('#scene-error').hidden = false; });
+new IntersectionObserver(entries => { sceneVisible = entries[0].isIntersecting; syncScene(); }).observe(scene);
+document.addEventListener('visibilitychange', syncScene);
 
 document.querySelectorAll('input[name="feature"]').forEach(input => {
   input.addEventListener('change', () => {
@@ -136,4 +189,5 @@ document.querySelectorAll('input[name="feature"]').forEach(input => {
 
 setSeason('summer');
 updatePauseControl();
-configureDoors();
+configureScenes();
+document.fonts.ready.then(() => configureScenes());

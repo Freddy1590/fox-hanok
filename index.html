@@ -8,8 +8,8 @@
   <title>HANOK — A home for the seasons</title>
   <link rel="icon" href="data:,">
   <link rel="preload" href="assets/NanumMyeongjo-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css?v=wow-1">
-  <script src="script.js?v=wow-1" defer></script>
+  <link rel="stylesheet" href="style.css?v=season-scroll-1">
+  <script src="script.js?v=season-scroll-1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#seasons">Skip to the seasons</a>
@@ -37,15 +37,17 @@
       <div class="story-copy"><p>A hanok is a traditional Korean home. Wood, earth, and paper come together in spaces that connect life indoors with the world outside.</p><p>Look a little closer. There is a reason for the raised wooden floor—and the warmth beneath another.</p><a class="text-link" href="#seasons">Find your favorite detail<span class="link-line" aria-hidden="true"></span></a></div>
     </section>
 
+    <div class="season-journey" id="season-journey">
     <section class="season-section" id="seasons" aria-labelledby="seasons-title" data-season="summer">
       <div class="content-width">
-        <div class="season-header"><h2 id="seasons-title">One home.<br>Two ways to feel.</h2><div class="season-choice"><p>Choose a season. Watch the house change.</p><div class="season-switch" role="group" aria-label="Choose a season"><button type="button" data-season="summer" aria-pressed="true">Summer</button><button type="button" data-season="winter" aria-pressed="false">Winter</button></div></div></div>
+        <div class="season-header"><h2 id="seasons-title">One home.<br>Two ways to feel.</h2><div class="season-choice"><p id="season-scroll-cue">Choose a season. Watch the house change.</p><div class="season-switch" role="group" aria-label="Choose a season"><button type="button" data-season="summer" aria-pressed="true">Summer</button><button type="button" data-season="winter" aria-pressed="false">Winter</button></div></div></div>
         <div class="season-layout">
-          <figure class="house-figure"><span class="season-watermark" aria-hidden="true">summer</span><object id="house-scene" data="assets/hanok-scene.svg?v=wow-1" type="image/svg+xml" aria-label="Illustrative hanok miniature showing the wooden maru and ondol room" tabindex="-1"><p>The raised wooden maru lets air move beneath it. An ondol system warms a room's floor from below.</p></object><figcaption><span id="scene-caption">Illustrative model · not the house in the photograph</span><button id="pause-scene" type="button" aria-pressed="false">Pause animation</button></figcaption><p id="scene-error" class="scene-error" hidden>The illustration could not load. Reload the page to try again.</p></figure>
+          <figure class="house-figure"><span class="season-watermark" aria-hidden="true">summer</span><object id="house-scene" data="assets/hanok-scene.svg?v=season-scroll-1" type="image/svg+xml" aria-label="Illustrative hanok miniature showing the wooden maru and ondol room" tabindex="-1"><p>The raised wooden maru lets air move beneath it. An ondol system warms a room's floor from below.</p></object><figcaption><span id="scene-caption">Illustrative model · not the house in the photograph</span><button id="pause-scene" type="button" aria-pressed="false">Pause animation</button></figcaption><p id="scene-error" class="scene-error" hidden>The illustration could not load. Reload the page to try again.</p></figure>
           <div class="season-description" aria-live="polite" aria-atomic="true"><span class="feature-name" id="feature-name">MARU · WOODEN FLOOR</span><h3 id="season-heading">Let the<br>breeze in.</h3><p class="primary-fact" id="season-fact">Air moves under the raised wooden floor.</p><p id="season-detail">A maru sits above the ground, leaving space for air to flow beneath the boards. Wide eaves can give shade from the high summer sun.</p><div class="feeling"><span class="feeling-line" aria-hidden="true"></span><span id="season-feeling">A place to enjoy the summer breeze.</span></div></div>
         </div>
       </div>
     </section>
+    </div>
 
     <section class="your-turn content-width" id="your-turn" aria-labelledby="your-turn-title">
       <div><h2 id="your-turn-title">What would you<br>show a friend?</h2><p>Choose a detail. Then finish the sentence<br class="desktop-break"> in your own words.</p><fieldset class="feature-choices"><legend class="sr-only">Choose a detail to introduce</legend><label><input type="radio" name="feature" value="maru" checked><span>The maru</span></label><label><input type="radio" name="feature" value="ondol"><span>The ondol</span></label></fieldset></div>
