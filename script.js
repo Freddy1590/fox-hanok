@@ -3,20 +3,65 @@
 document.documentElement.classList.replace('no-js', 'js');
 
 const hero = document.querySelector('.hero');
+const journey = document.querySelector('.door-journey');
 const doorButton = document.querySelector('#door-toggle');
 const doorStatus = document.querySelector('.door-status');
+const scrollLabel = document.querySelector('#scroll-label');
 const section = document.querySelector('#seasons');
 const scene = document.querySelector('#house-scene');
 const pauseButton = document.querySelector('#pause-scene');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let paused = reducedMotion.matches;
+let doorProgress = 0;
+let doorStart = 0;
+let doorEnd = 1;
+let doorFrame = 0;
+let doorEndpoint = '';
 
-doorButton.addEventListener('click', () => {
-  const open = hero.classList.toggle('is-open');
+function renderDoors(progress) {
+  doorProgress = Math.min(1, Math.max(0, progress));
+  const open = doorProgress >= .98;
+  hero.style.setProperty('--door-progress', doorProgress);
+  hero.style.setProperty('--door-copy-fade', Math.min(1, Math.max(0, (doorProgress - .2) / .5)));
+  hero.classList.toggle('is-open', reducedMotion.matches ? open : doorProgress > .12);
   doorButton.firstChild.textContent = open ? 'Close the doors' : 'Open the doors';
   doorButton.setAttribute('aria-expanded', String(open));
-  doorStatus.textContent = open ? 'The doors are open. A hanok courtyard is revealed.' : 'The doors are closed.';
+  scrollLabel.textContent = open ? 'Keep scrolling to explore' : 'Scroll to open';
+  const endpoint = open ? 'open' : doorProgress <= .01 ? 'closed' : '';
+  if (endpoint && endpoint !== doorEndpoint) {
+    doorStatus.textContent = open ? 'The doors are open. A hanok courtyard is revealed.' : 'The doors are closed.';
+    doorEndpoint = endpoint;
+  }
+}
+
+function measureDoorJourney() {
+  const top = journey.getBoundingClientRect().top + window.scrollY;
+  doorStart = Math.max(0, top - 24);
+  doorEnd = top + journey.offsetHeight - hero.offsetHeight;
+}
+
+function updateDoorsFromScroll() {
+  doorFrame = 0;
+  if (!reducedMotion.matches) renderDoors((window.scrollY - doorStart) / Math.max(1, doorEnd - doorStart));
+}
+
+function queueDoorUpdate() {
+  if (!doorFrame && !reducedMotion.matches) doorFrame = requestAnimationFrame(updateDoorsFromScroll);
+}
+
+function configureDoors() {
+  document.documentElement.classList.toggle('scroll-doors', !reducedMotion.matches);
+  if (reducedMotion.matches) renderDoors(doorProgress >= .5 ? 1 : 0);
+  else { measureDoorJourney(); updateDoorsFromScroll(); }
+}
+
+doorButton.addEventListener('click', event => {
+  if (reducedMotion.matches) renderDoors(doorProgress >= .98 ? 0 : 1);
+  else window.scrollTo({ top: doorProgress >= .98 ? doorStart : doorEnd, behavior: event.detail === 0 ? 'auto' : 'smooth' });
 });
+window.addEventListener('scroll', queueDoorUpdate, { passive: true });
+window.addEventListener('resize', () => { if (!reducedMotion.matches) { measureDoorJourney(); queueDoorUpdate(); } });
+window.addEventListener('pageshow', configureDoors);
 
 const seasons = {
   summer: {
@@ -74,7 +119,7 @@ function updatePauseControl() {
 }
 
 pauseButton.addEventListener('click', () => { paused = !paused; updatePauseControl(); });
-reducedMotion.addEventListener('change', () => { paused = reducedMotion.matches; updatePauseControl(); });
+reducedMotion.addEventListener('change', () => { paused = reducedMotion.matches; updatePauseControl(); configureDoors(); });
 scene.addEventListener('load', syncScene);
 scene.addEventListener('error', () => { document.querySelector('#scene-error').hidden = false; });
 
@@ -86,3 +131,4 @@ document.querySelectorAll('input[name="feature"]').forEach(input => {
 
 setSeason('summer');
 updatePauseControl();
+configureDoors();

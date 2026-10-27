@@ -8,8 +8,8 @@
   <title>HANOK — A home for the seasons</title>
   <link rel="icon" href="data:,">
   <link rel="preload" href="assets/NanumMyeongjo-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="style.css?v=scroll-1">
+  <script src="script.js?v=scroll-1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#seasons">Skip to the seasons</a>
@@ -19,14 +19,16 @@
   </header>
 
   <main>
-    <section class="hero" id="home" aria-labelledby="hero-title">
+    <section class="door-journey" id="home" aria-labelledby="hero-title">
+      <div class="hero">
       <img class="courtyard" src="assets/hero-hanok.jpg" width="1920" height="1280" alt="Tiled roofs, timber rooms, and a quiet courtyard at Baek In-je House in Seoul" fetchpriority="high">
       <div class="photo-shade" aria-hidden="true"></div>
       <div class="doors" aria-hidden="true"><div class="door door-left"><div class="lattice"></div><span class="door-pull"></span></div><div class="door door-right"><div class="lattice"></div><span class="door-pull"></span></div></div>
       <div class="hero-copy"><h1 id="hero-title">HANOK</h1><p>A Korean home,<br>shaped by the seasons.</p></div>
-      <div class="hero-actions"><button class="door-toggle" id="door-toggle" aria-expanded="false">Open the doors<span class="button-line" aria-hidden="true"></span></button><a class="enter-link" href="#seasons">Discover the seasons</a></div>
+      <div class="hero-actions"><p class="scroll-cue"><span id="scroll-label">Scroll to open</span><span class="scroll-track" aria-hidden="true"></span></p><button class="door-toggle" id="door-toggle" aria-expanded="false">Open the doors<span class="button-line" aria-hidden="true"></span></button><a class="enter-link" href="#seasons">Discover the seasons</a></div>
       <span class="hero-location">BAEK IN-JE HOUSE · SEOUL</span><span class="hero-side-note">A WINDOW INTO KOREA</span>
       <span class="door-status sr-only" role="status"></span>
+      </div>
     </section>
 
     <section class="story content-width" id="story" aria-labelledby="story-title">
