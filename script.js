@@ -23,6 +23,7 @@ function renderDoors(progress) {
   const open = doorProgress >= .98;
   hero.style.setProperty('--door-progress', doorProgress);
   hero.style.setProperty('--door-copy-fade', Math.min(1, Math.max(0, (doorProgress - .2) / .5)));
+  hero.style.setProperty('--sunlight-opacity', Math.sin(Math.PI * doorProgress) * .32);
   hero.classList.toggle('is-open', reducedMotion.matches ? open : doorProgress > .12);
   doorButton.firstChild.textContent = open ? 'Close the doors' : 'Open the doors';
   doorButton.setAttribute('aria-expanded', String(open));
@@ -68,13 +69,15 @@ const seasons = {
     name: 'MARU · WOODEN FLOOR', heading: 'Let the\nbreeze in.',
     fact: 'Air moves under the raised wooden floor.',
     detail: 'A maru sits above the ground, leaving space for air to flow beneath the boards. Wide eaves can give shade from the high summer sun.',
-    feeling: 'A place to enjoy the summer breeze.'
+    feeling: 'A place to enjoy the summer breeze.',
+    caption: 'Illustrative model · not the house in the photograph'
   },
   winter: {
     name: 'ONDOL · HEATED FLOOR', heading: 'Warmth, from\nthe ground up.',
     fact: 'Ondol warms the floor from below.',
     detail: 'In a traditional ondol system, hot gases from a hearth travel through channels beneath a room’s stone floor, then leave through a chimney.',
-    feeling: 'Warm floors for cold winter days.'
+    feeling: 'Warm floors for cold winter days.',
+    caption: 'Cutaway view: heat channels beneath the ondol room.'
   }
 };
 
@@ -104,6 +107,7 @@ function setSeason(season) {
   document.querySelector('#season-fact').textContent = copy.fact;
   document.querySelector('#season-detail').textContent = copy.detail;
   document.querySelector('#season-feeling').textContent = copy.feeling;
+  document.querySelector('#scene-caption').textContent = copy.caption;
   syncScene();
 }
 
@@ -112,6 +116,7 @@ document.querySelectorAll('.season-switch button').forEach(button => {
 });
 
 function updatePauseControl() {
+  section.dataset.paused = String(paused || reducedMotion.matches);
   pauseButton.setAttribute('aria-pressed', String(paused));
   pauseButton.textContent = reducedMotion.matches ? 'Reduced motion on' : paused ? 'Play animation' : 'Pause animation';
   pauseButton.disabled = reducedMotion.matches;
