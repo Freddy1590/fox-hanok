@@ -1,16 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" role="img" aria-labelledby="scene-title scene-desc" data-season="summer">
   <title id="scene-title">One hanok, two seasons</title>
-  <desc id="scene-desc">An illustrative miniature, not a specific building. The enclosed ondol room is on the left; the raised wooden maru is on the right. Air flows under the maru in summer. Heat moves through channels under the ondol room in winter and smoke leaves the chimney.</desc>
+  <desc id="scene-desc">An illustrative miniature, not a specific building. A closer view shows air beneath the raised wooden maru on the right. In winter, a cutaway beneath the enclosed ondol room on the left reveals heat channels below its stone floor. Smoke leaves through the chimney.</desc>
   <defs>
-    <clipPath id="flue-windows"><path d="M206 402L254 413V434L206 423ZM281 421L334 434V455L281 441ZM355 441L415 456V477L355 462Z"/></clipPath>
+    <clipPath id="flue-windows"><path d="M187 388L258 403V428L188 413ZM275 407L337 423V449L274 433ZM357 427L430 444V471L356 453Z"/></clipPath>
+    <clipPath id="cutaway-reveal"><path d="M170 360L460 430L454 501L167 426Z"/></clipPath>
   </defs>
   <style>
-    .summer-model,#summer-effects,#sun-summer{opacity:1;transition:opacity 850ms ease}
-    .winter-model,#winter-effects,#snow-winter{opacity:0;transition:opacity 850ms ease}
-    :root[data-season="winter"] .summer-model,:root[data-season="winter"] #summer-effects,:root[data-season="winter"] #sun-summer{opacity:0}
-    :root[data-season="winter"] .winter-model,:root[data-season="winter"] #winter-effects,:root[data-season="winter"] #snow-winter{opacity:1}
-    :root[data-scroll="true"] .summer-model,:root[data-scroll="true"] #summer-effects,:root[data-scroll="true"] #sun-summer{opacity:var(--summer-opacity,1);transition:none}
-    :root[data-scroll="true"] .winter-model,:root[data-scroll="true"] #winter-effects,:root[data-scroll="true"] #snow-winter{opacity:var(--winter-opacity,0);transition:none}
+    .summer-model,.winter-model,.cutaway-model,#summer-effects,#winter-effects,#sun-summer,#snow-winter{transition:opacity 850ms ease}
+    .summer-model,#sun-summer{opacity:var(--summer-opacity,1)}
+    .winter-model{opacity:var(--winter-opacity,0)}
+    .cutaway-model{opacity:calc(var(--winter-opacity,0) * var(--cutaway-opacity,0))}
+    #summer-effects{opacity:calc(var(--summer-opacity,1) * var(--air-opacity,1))}
+    #winter-effects,#snow-winter{opacity:var(--winter-opacity,0)}
+    #cutaway-heat{opacity:var(--heat-opacity,0)}
+    #overview-labels{opacity:var(--overview-opacity,1)}
+    :root[data-scroll="true"] .summer-model,:root[data-scroll="true"] .winter-model,:root[data-scroll="true"] .cutaway-model,:root[data-scroll="true"] #summer-effects,:root[data-scroll="true"] #winter-effects,:root[data-scroll="true"] #sun-summer,:root[data-scroll="true"] #snow-winter{transition:none}
     .breeze{stroke-dasharray:75 35 12 35;animation:breeze 4.8s linear infinite}
     .breeze:nth-child(2){animation-delay:-1.6s}.breeze:nth-child(3){animation-delay:-3.2s}
     .heat{stroke-dasharray:25 16;animation:heat 3s linear infinite}
@@ -25,16 +29,18 @@
     :root[data-paused="true"] *{animation-play-state:paused!important}
     @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
+  <g id="camera">
   <g id="sun-summer" aria-hidden="true"><path d="M80 50L470 140L790 570L440 565Z" fill="#e9c57c" opacity=".07"/></g>
   <image class="summer-model" href="hanok-summer-v2.webp" x="0" y="0" width="1000" height="610" preserveAspectRatio="xMidYMid meet"/>
   <image class="winter-model" href="hanok-winter-v2.webp" x="0" y="0" width="1000" height="610" preserveAspectRatio="xMidYMid meet"/>
+  <image class="cutaway-model" href="ondol-cutaway-v1.webp" x="25" y="15.25" width="950" height="579.5" preserveAspectRatio="xMidYMid meet" clip-path="url(#cutaway-reveal)"/>
   <g id="summer-effects" fill="none" stroke="#228a9d" stroke-width="3.5" stroke-linecap="round">
     <path class="breeze" d="M958 462C900 442 856 472 806 478S725 487 681 497S595 525 551 501"/>
     <path class="breeze" d="M940 496C896 480 861 501 816 508S725 515 674 529S616 544 578 520"/>
     <path class="breeze" d="M911 431C873 416 841 450 814 462S776 478 742 480"/>
   </g>
   <g id="winter-effects" fill="none" stroke-linecap="round">
-    <g clip-path="url(#flue-windows)"><path d="M207 413L417 465" stroke="#ffc46a" stroke-width="24" opacity=".55"/><path class="heat" d="M207 413L417 465" stroke="#ffb541" stroke-width="5"/></g>
+    <g id="cutaway-heat" clip-path="url(#flue-windows)"><path d="M198 405L429 458" stroke="#ffc46a" stroke-width="20" opacity=".35"/><path class="heat" d="M198 405L429 458" stroke="#ffb541" stroke-width="4"/></g>
     <path class="smoke" d="M856 143C840 126 867 115 850 99C837 87 860 73 851 60" stroke="#9eb4bb" stroke-width="3"/>
     <path class="smoke" d="M865 144C879 127 853 116 867 101" stroke="#b8c8cb" stroke-width="2"/>
   </g>
@@ -44,6 +50,9 @@
     <circle class="flake" cx="65" cy="345" r="2.8"/><circle class="flake" cx="918" cy="350" r="3.2"/><circle class="flake" cx="953" cy="507" r="2.4"/>
     <circle class="flake" cx="516" cy="112" r="2"/><circle class="flake" cx="742" cy="180" r="2"/><circle class="flake" cx="116" cy="520" r="2.3"/>
   </g>
+  <g id="overview-labels">
   <g class="leader"><path d="M312 447V588L271 611"/><circle cx="312" cy="447" r="3"/><path d="M742 503L809 548V608"/><circle cx="742" cy="503" r="3"/></g>
   <g class="label"><text x="222" y="634">ONDOL</text><text x="782" y="634">MARU</text></g>
+  </g>
+  </g>
 </svg>

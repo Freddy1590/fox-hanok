@@ -24,6 +24,16 @@ let seasonEnd = 1;
 let seasonProgress = 0;
 let seasonMix = 0;
 let sceneVisible = false;
+let maruFocus = 0;
+let ondolFocus = 0;
+let cutaway = 0;
+let airReveal = 1;
+let heatReveal = 0;
+
+function easeRange(value, start, end) {
+  const t = Math.min(1, Math.max(0, (value - start) / (end - start)));
+  return t * t * (3 - 2 * t);
+}
 
 function renderDoors(progress) {
   doorProgress = Math.min(1, Math.max(0, progress));
@@ -68,17 +78,15 @@ function configureScenes(preservePosition = false) {
   // Keep all prose reachable when a short viewport cannot contain the pinned scene.
   scrollSeasons = !reducedMotion.matches && section.offsetHeight <= window.innerHeight + 1;
   document.documentElement.classList.toggle('scroll-seasons', scrollSeasons);
-  if (scrollSeasons) seasonJourney.style.height = `${section.offsetHeight + window.innerHeight * 1.6}px`;
+  if (scrollSeasons) seasonJourney.style.height = `${section.offsetHeight + window.innerHeight * 3.2}px`;
   seasonStart = seasonJourney.getBoundingClientRect().top + window.scrollY;
   seasonEnd = seasonStart + seasonJourney.offsetHeight - section.offsetHeight;
-  document.querySelector('#season-scroll-cue').textContent = scrollSeasons ? 'Scroll from summer into winter.' : 'Choose a season. Watch the house change.';
+  document.querySelector('#season-scroll-cue').textContent = scrollSeasons ? 'Scroll closer. Follow the breeze and warmth.' : 'Choose a season. Explore the details.';
   if (preservePosition && wasInSeason) {
     window.scrollTo({ top: scrollSeasons ? seasonStart + previousProgress * (seasonEnd - seasonStart) : seasonStart, behavior: 'instant' });
   }
   if (!scrollSeasons) {
-    seasonMix = Number(section.dataset.season === 'winter');
-    section.style.setProperty('--season-copy-opacity', 1);
-    syncScene();
+    renderSeasonProgress(section.dataset.season === 'winter' ? .85 : .26);
   }
   if (reducedMotion.matches) renderDoors(doorProgress >= .5 ? 1 : 0);
   else { measureDoorJourney(); updateScenesFromScroll(); }
@@ -95,7 +103,7 @@ window.addEventListener('pageshow', () => configureScenes());
 const seasons = {
   summer: {
     name: 'MARU · WOODEN FLOOR', heading: 'Let the\nbreeze in.',
-    fact: 'Air moves under the raised wooden floor.',
+    fact: 'Air flows under the raised wooden floor.',
     detail: 'A maru sits above the ground, leaving space for air to flow beneath the boards. Wide eaves can give shade from the high summer sun.',
     feeling: 'A place to enjoy the summer breeze.',
     caption: 'Illustrative model · not the house in the photograph'
@@ -117,6 +125,14 @@ function syncScene() {
     root.dataset.scroll = String(scrollSeasons);
     root.style.setProperty('--summer-opacity', 1 - seasonMix);
     root.style.setProperty('--winter-opacity', seasonMix);
+    root.style.setProperty('--cutaway-opacity', cutaway);
+    root.style.setProperty('--air-opacity', airReveal);
+    root.style.setProperty('--heat-opacity', heatReveal);
+    root.style.setProperty('--overview-opacity', 1 - Math.max(maruFocus, ondolFocus));
+    const scale = 1 + maruFocus + ondolFocus * 1.25;
+    const x = maruFocus * (500 - 742 * 2) + ondolFocus * (500 - 312 * 2.25);
+    const y = maruFocus * (370 - 503 * 2) + ondolFocus * (370 - 447 * 2.25);
+    root.querySelector('#camera')?.setAttribute('transform', `translate(${x} ${y}) scale(${scale})`);
   }
 }
 
@@ -143,12 +159,23 @@ function setSeason(season) {
 
 function renderSeasonProgress(progress) {
   seasonProgress = Math.min(1, Math.max(0, progress));
-  const blend = Math.min(1, Math.max(0, (seasonProgress - .2) / .6));
-  seasonMix = blend * blend * (3 - 2 * blend);
+  const p = seasonProgress;
+  seasonMix = easeRange(p, .4, .58);
+  maruFocus = easeRange(p, .07, .18) * (1 - easeRange(p, .29, .41));
+  ondolFocus = easeRange(p, .59, .71) * (1 - easeRange(p, .88, .99));
+  cutaway = easeRange(p, .72, .77) * (1 - easeRange(p, .89, .96));
+  airReveal = easeRange(p, .18, .21) * (1 - easeRange(p, .3, .36));
+  heatReveal = easeRange(p, .77, .8) * (1 - easeRange(p, .88, .93));
+  const overviewCopy = 1 - easeRange(p, .04, .09) + easeRange(p, .98, 1);
+  const maruCopy = easeRange(p, .19, .22) * (1 - easeRange(p, .28, .31));
+  const ondolCopy = easeRange(p, .78, .81) * (1 - easeRange(p, .87, .9));
   section.style.setProperty('--season-progress', seasonMix);
   section.style.setProperty('--summer-opacity', 1 - seasonMix);
   section.style.setProperty('--winter-opacity', seasonMix);
-  section.style.setProperty('--season-copy-opacity', Math.min(1, Math.abs(seasonMix - .5) * 4));
+  section.style.setProperty('--season-copy-opacity', Math.max(overviewCopy, maruCopy, ondolCopy));
+  section.style.setProperty('--season-detail-opacity', overviewCopy);
+  section.style.setProperty('--caption-opacity', Math.min(1, Math.abs(seasonMix - .5) * 4));
+  section.style.setProperty('--overview-opacity', 1 - Math.max(maruFocus, ondolFocus));
   const season = seasonMix < .5 ? 'summer' : 'winter';
   if (section.dataset.season !== season) setSeason(season);
   syncScene();
@@ -157,11 +184,10 @@ function renderSeasonProgress(progress) {
 document.querySelectorAll('.season-switch button').forEach(button => {
   button.addEventListener('click', event => {
     if (scrollSeasons) {
-      window.scrollTo({ top: button.dataset.season === 'winter' ? seasonEnd : seasonStart, behavior: event.detail === 0 ? 'instant' : 'smooth' });
+      const progress = button.dataset.season === 'winter' ? .85 : .26;
+      window.scrollTo({ top: seasonStart + progress * (seasonEnd - seasonStart), behavior: event.detail === 0 ? 'auto' : 'smooth' });
     } else {
-      seasonMix = Number(button.dataset.season === 'winter');
-      setSeason(button.dataset.season);
-      syncScene();
+      renderSeasonProgress(button.dataset.season === 'winter' ? .85 : .26);
     }
   });
 });
