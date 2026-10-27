@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" role="img" aria-labelledby="scene-title scene-desc" data-season="summer">
+  <title id="scene-title">A hanok through the seasons</title>
+  <desc id="scene-desc">A conceptual cutaway of a Korean hanok, rather than a specific building, with a raised wooden maru on the right and an ondol room on the left. Summer breezes travel below the maru. In winter, heat travels under the ondol floor and exits through a chimney.</desc>
+  <defs>
+    <pattern id="tiles" width="25" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(13)">
+      <path d="M0 0V22M25 0V22M0 20Q12 27 25 20" fill="none" stroke="#7c827d" stroke-width="1" opacity=".7"/>
+      <path d="M3 0V20" stroke="#343d38" stroke-width="3"/>
+    </pattern>
+    <pattern id="paper-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#ede6d3"/>
+      <path d="M0 0H20M0 0V20M10 0V20M0 10H20" fill="none" stroke="#a89473" stroke-width="1.3"/>
+    </pattern>
+    <pattern id="brick" width="28" height="20" patternUnits="userSpaceOnUse">
+      <rect width="28" height="20" fill="#9d9b8c"/>
+      <path d="M0 0H28M0 10H28M14 0V10M0 10V20M28 10V20" stroke="#c8c3b0" fill="none"/>
+    </pattern>
+    <clipPath id="roof-front"><path d="M259 157L743 269Q727 340 681 391Q416 348 120 270Q203 256 259 157Z"/></clipPath>
+  </defs>
+  <style>
+    #summer-effects, #sun-summer { opacity: 1; transition: opacity .65s ease; }
+    #winter-effects, #snow-winter, .snow-edge { opacity: 0; transition: opacity .65s ease; }
+    :root[data-season="winter"] #summer-effects, :root[data-season="winter"] #sun-summer { opacity: 0; }
+    :root[data-season="winter"] #winter-effects, :root[data-season="winter"] #snow-winter,
+    :root[data-season="winter"] .snow-edge { opacity: 1; }
+    .breeze { stroke-dasharray: 90 35 14 35; animation: breeze 4s linear infinite; }
+    .breeze:nth-child(2) { animation-delay: -1.3s; }
+    .breeze:nth-child(3) { animation-delay: -2.6s; }
+    .heat { stroke-dasharray: 20 18; animation: warmth 2.8s linear infinite; }
+    .smoke { animation: smoke 4.5s ease-in-out infinite; transform-origin: 841px 306px; }
+    .flake { animation: snowfall 6s ease-in-out infinite; }
+    .flake:nth-child(even) { animation-delay: -3s; }
+    .winter-floor { transition: fill .65s ease; }
+    :root[data-season="winter"] .winter-floor { fill: #cb9657; }
+    @keyframes breeze { to { stroke-dashoffset: -348; } }
+    @keyframes warmth { to { stroke-dashoffset: -152; } }
+    @keyframes smoke { 0%,100% { transform: translateY(3px); opacity: .4; } 50% { transform: translateY(-9px); opacity: .85; } }
+    @keyframes snowfall { 0%,100% { transform: translate(0,-6px); } 50% { transform: translate(5px,6px); } }
+    :root[data-paused="true"] * { animation-play-state: paused !important; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  </style>
+
+  <!-- The open front is a teaching cutaway, rather than a depiction of a specific building. -->
+  <g id="sun-summer" fill="none" stroke="#c2a052" stroke-width="1.5">
+    <circle cx="838" cy="126" r="29" fill="#dfc179" stroke="none" opacity=".8"/>
+    <path d="M838 82V72M838 170V180M794 126H784M882 126H892M807 95L800 88M869 157L876 164M807 157L800 164M869 95L876 88"/>
+  </g>
+  <path d="M85 498L639 626L923 460L368 337Z" fill="#777d68" opacity=".09"/>
+  <path d="M123 453L663 579L879 450L341 326Z" fill="#d6ceba"/>
+  <path d="M123 453V470L663 596V579Z" fill="#b8ae98"/>
+  <path d="M663 579L879 450V466L663 596Z" fill="#c1b6a0"/>
+  <g stroke="#c8bea8" stroke-width="1" fill="none">
+    <path d="M181 467L398 339M287 491L504 364M393 516L610 389M499 541L716 414M605 566L822 439"/>
+    <path d="M176 423L714 548M230 391L768 516M285 359L823 484"/>
+  </g>
+
+  <!-- Rear wall and side wall. -->
+  <path d="M345 258L831 371V257L345 145Z" fill="#dad2bb"/>
+  <path d="M659 400L831 298V435L659 538Z" fill="#bfb396"/>
+  <path d="M684 406L805 334V412L684 484Z" fill="#d9cfb4" stroke="#816a4e" stroke-width="7"/>
+  <path d="M694 407L795 347V405L694 465Z" fill="url(#paper-grid)"/>
+  <path d="M745 378V438" stroke="#927958" stroke-width="6"/>
+
+  <!-- A low brick chimney, behind the house. -->
+  <path d="M822 350V294L844 282L863 287V337L844 349Z" fill="url(#brick)" stroke="#8f8e80" stroke-width="1"/>
+  <path d="M815 294L840 280L870 286L844 302Z" fill="#74796d"/>
+  <path d="M824 292L841 283L860 288L843 297Z" fill="#404b43"/>
+
+  <!-- Raised deck: supports leave a visible passage for air. -->
+  <path d="M180 445L659 555V512L180 402Z" fill="#4d4b3c"/>
+  <path d="M659 512L831 409V452L659 555Z" fill="#625a43"/>
+  <g fill="#8f7c5a" stroke="#685b43" stroke-width="1">
+    <path d="M466 470L485 474V526L466 522Z"/>
+    <path d="M553 490L572 494V546L553 542Z"/>
+    <path d="M644 511L663 515V566L644 562Z"/>
+    <path d="M747 456L761 448V499L747 507Z"/>
+    <path d="M812 417L826 409V460L812 468Z"/>
+  </g>
+  <g fill="#aaa68e">
+    <path d="M457 519L479 514L495 520L477 530Z"/>
+    <path d="M544 539L566 534L582 540L564 550Z"/>
+    <path d="M634 559L657 554L674 560L655 571Z"/>
+    <path d="M740 503L754 492L772 495L755 510Z"/>
+  </g>
+  <path class="winter-floor" d="M180 407L443 468L614 367L351 306Z" fill="#c4b18e" stroke="#998667" stroke-width="1.5"/>
+  <path d="M443 468L659 518L831 416L614 367Z" fill="#b99564" stroke="#8b714f" stroke-width="2"/>
+  <g stroke="#8e7351" stroke-width="1.5" fill="none">
+    <path d="M466 474L637 372M494 481L665 379M522 487L693 385M550 494L721 392M578 500L749 398M606 507L777 405M634 513L805 411"/>
+    <path d="M495 438L711 488M549 406L765 456"/>
+  </g>
+  <!-- An exposed ondol flue, confined to the room on the left. -->
+  <path d="M180 418L443 479V530L180 469Z" fill="#b9a382"/>
+  <path d="M193 440L429 495V516L193 461Z" fill="#716149"/>
+  <g fill="#c8b89c">
+    <path d="M252 451L262 453V477L252 475Z"/><path d="M320 467L330 469V493L320 491Z"/><path d="M388 483L398 485V509L388 507Z"/>
+  </g>
+  <path d="M180 418L443 479V487L180 426Z" fill="#e2cda7"/>
+  <path d="M180 469L443 530V537L180 476Z" fill="#8c7c60"/>
+
+  <!-- Ochre timber posts, beams and room screens. -->
+  <path d="M193 316L443 374V466L193 408Z" fill="#e5ddc5"/>
+  <path d="M208 323L325 350V431L208 404Z" fill="url(#paper-grid)" stroke="#957550" stroke-width="6"/>
+  <path d="M338 353L426 374V454L338 434Z" fill="url(#paper-grid)" stroke="#957550" stroke-width="6"/>
+  <path d="M266 338V416M382 363V443" stroke="#957550" stroke-width="4"/>
+  <path d="M442 379L613 278V369L442 470Z" fill="#e9dfc3"/>
+  <path d="M455 382L595 299V357L455 440Z" fill="url(#paper-grid)" stroke="#957550" stroke-width="5"/>
+  <g fill="#99764c" stroke="#765a3a" stroke-width="1">
+    <path d="M179 290L194 294V418L179 415Z"/>
+    <path d="M431 348L446 352V475L431 472Z"/>
+    <path d="M646 398L663 402V525L646 521Z"/>
+    <path d="M820 295L833 287V421L820 429Z"/>
+    <path d="M179 298L663 410V394L179 282Z"/>
+    <path d="M663 410L833 309V293L663 394Z"/>
+  </g>
+  <g stroke="#c2a272" stroke-width="2" opacity=".6">
+    <path d="M184 305V406M436 363V463M651 414V513M824 313V415"/>
+  </g>
+  <path d="M170 302L666 416L845 311L845 291L664 396L170 283Z" fill="#3a3d31" opacity=".15"/>
+
+  <!-- Broad, softly lifted tiled eaves. -->
+  <path d="M259 157L743 269Q789 265 895 250Q662 199 350 135Q306 155 259 157Z" fill="#798078" stroke="#4f5a50" stroke-width="2"/>
+  <path d="M259 157L743 269Q727 340 681 391Q416 348 120 270Q203 256 259 157Z" fill="#58645a"/>
+  <g clip-path="url(#roof-front)">
+    <path d="M259 157L743 269Q727 340 681 391Q416 348 120 270Q203 256 259 157Z" fill="url(#tiles)"/>
+    <path d="M227 199L720 314M198 230L705 347M160 255L690 375" fill="none" stroke="#899187" stroke-width="1.1" opacity=".7"/>
+  </g>
+  <path d="M743 269Q800 280 895 250Q840 346 681 391Q727 340 743 269Z" fill="#6b766a" stroke="#455447" stroke-width="2"/>
+  <g fill="none" stroke="#a8aea0" stroke-width="1.5" opacity=".6">
+    <path d="M751 286Q808 298 875 279M744 304Q797 319 855 306M734 323Q777 337 830 330M722 344Q754 355 799 352M704 367Q731 377 757 376"/>
+  </g>
+  <path d="M120 270Q416 348 681 391Q840 346 895 250" fill="none" stroke="#36483b" stroke-width="12" stroke-linecap="round"/>
+  <path d="M120 266Q416 344 681 387Q840 342 895 246" fill="none" stroke="#8c9484" stroke-width="3" stroke-linecap="round"/>
+  <path d="M247 151Q479 200 746 263" fill="none" stroke="#344639" stroke-width="12" stroke-linecap="round"/>
+  <path d="M247 147Q479 196 746 259" fill="none" stroke="#a3aa96" stroke-width="3" stroke-linecap="round"/>
+  <path class="snow-edge" d="M247 145Q479 194 746 257M122 262Q416 340 681 383Q840 338 895 242" fill="none" stroke="#f8f8ef" stroke-width="8" stroke-linecap="round"/>
+
+  <g id="summer-effects" fill="none" stroke="#649aa6" stroke-width="4" stroke-linecap="round">
+    <path class="breeze" d="M933 432C881 418 841 460 796 468S729 477 696 509S626 556 568 541"/>
+    <path class="breeze" d="M931 469C888 449 863 479 821 487S761 502 729 526S671 574 613 567"/>
+    <path class="breeze" d="M882 393C839 381 822 410 799 425S766 442 747 452"/>
+  </g>
+  <g id="winter-effects" fill="none" stroke-linecap="round">
+    <path d="M193 449L429 504" stroke="#eebc71" stroke-width="16" opacity=".25"/>
+    <path class="heat" d="M193 449L429 504" stroke="#d18b3c" stroke-width="5"/>
+    <path class="heat" d="M233 454V437M291 468V451M350 482V465M408 495V478" stroke="#d49a51" stroke-width="2.5"/>
+    <path class="smoke" d="M843 284C824 265 864 254 844 233C827 215 857 205 845 185" stroke="#9da69d" stroke-width="3"/>
+    <path class="smoke" d="M854 279C868 261 843 248 861 228" stroke="#b9bdb3" stroke-width="2"/>
+  </g>
+  <g id="snow-winter" fill="#aab8b8">
+    <circle class="flake" cx="172" cy="151" r="3"/><circle class="flake" cx="403" cy="96" r="3.5"/>
+    <circle class="flake" cx="576" cy="138" r="2.5"/><circle class="flake" cx="775" cy="103" r="3"/>
+    <circle class="flake" cx="886" cy="172" r="3.5"/><circle class="flake" cx="106" cy="376" r="3"/>
+    <circle class="flake" cx="924" cy="343" r="2.5"/><circle class="flake" cx="905" cy="530" r="3"/>
+  </g>
+  <g fill="none" stroke="#8b8a77" stroke-width="1">
+    <path d="M296 482V558L251 584"/><circle cx="296" cy="482" r="3" fill="#8b8a77"/>
+    <path d="M726 461L781 499V553"/><circle cx="726" cy="461" r="3" fill="#8b8a77"/>
+  </g>
+  <g fill="#4b5549" font-family="Arial, sans-serif" font-size="13" letter-spacing="3">
+    <text x="183" y="605">ONDOL</text><text x="753" y="578">MARU</text>
+  </g>
+</svg>
