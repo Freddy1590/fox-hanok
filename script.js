@@ -70,23 +70,31 @@ function queueScrollUpdate() {
 }
 
 function configureScenes(preservePosition = false) {
-  const wasInSeason = scrollSeasons && window.scrollY >= seasonStart && window.scrollY <= seasonEnd;
+  const previousPin = scrollSeasons;
+  const previousStart = seasonStart;
+  const previousEnd = seasonEnd;
+  const box = section.getBoundingClientRect();
+  // Engines apply scroll anchoring at different times during a resize.
+  const wasInSeason = (window.scrollY >= seasonStart - 1 && window.scrollY <= seasonEnd + 1)
+    || (box.top <= 1 && box.bottom >= Math.min(window.innerHeight, box.height) - 1);
   const previousProgress = seasonProgress;
   document.documentElement.classList.toggle('scroll-doors', !reducedMotion.matches);
   document.documentElement.classList.toggle('scroll-seasons', !reducedMotion.matches);
-  seasonJourney.style.height = '';
   // Keep all prose reachable when a short viewport cannot contain the pinned scene.
   scrollSeasons = !reducedMotion.matches && section.offsetHeight <= window.innerHeight + 1;
   document.documentElement.classList.toggle('scroll-seasons', scrollSeasons);
-  if (scrollSeasons) seasonJourney.style.height = `${section.offsetHeight + window.innerHeight * 3.2}px`;
+  seasonJourney.style.height = scrollSeasons ? `${section.offsetHeight * 4.2}px` : '';
   seasonStart = seasonJourney.getBoundingClientRect().top + window.scrollY;
-  seasonEnd = seasonStart + seasonJourney.offsetHeight - section.offsetHeight;
+  seasonEnd = seasonStart + (scrollSeasons
+    ? seasonJourney.offsetHeight - section.offsetHeight
+    : Math.max(0, section.offsetHeight - window.innerHeight));
   document.querySelector('#season-scroll-cue').textContent = scrollSeasons ? 'Scroll closer. Follow the breeze and warmth.' : 'Choose a season. Explore the details.';
-  if (preservePosition && wasInSeason) {
-    window.scrollTo({ top: scrollSeasons ? seasonStart + previousProgress * (seasonEnd - seasonStart) : seasonStart, behavior: 'instant' });
+  const geometryChanged = previousPin !== scrollSeasons || Math.abs(previousStart - seasonStart) > 1 || Math.abs(previousEnd - seasonEnd) > 1;
+  if (preservePosition && wasInSeason && geometryChanged) {
+    window.scrollTo({ top: scrollSeasons ? seasonStart + previousProgress * (seasonEnd - seasonStart) : seasonStart, behavior: 'auto' });
   }
   if (!scrollSeasons) {
-    renderSeasonProgress(section.dataset.season === 'winter' ? .85 : .26);
+    renderSeasonProgress(previousProgress);
   }
   if (reducedMotion.matches) renderDoors(doorProgress >= .5 ? 1 : 0);
   else { measureDoorJourney(); updateScenesFromScroll(); }
@@ -98,7 +106,7 @@ doorButton.addEventListener('click', event => {
 });
 window.addEventListener('scroll', queueScrollUpdate, { passive: true });
 window.addEventListener('resize', () => configureScenes(true));
-window.addEventListener('pageshow', () => configureScenes());
+window.addEventListener('pageshow', () => configureScenes(true));
 
 const seasons = {
   summer: {
@@ -129,9 +137,9 @@ function syncScene() {
     root.style.setProperty('--air-opacity', airReveal);
     root.style.setProperty('--heat-opacity', heatReveal);
     root.style.setProperty('--overview-opacity', 1 - Math.max(maruFocus, ondolFocus));
-    const scale = 1 + maruFocus + ondolFocus * 1.25;
-    const x = maruFocus * (500 - 742 * 2) + ondolFocus * (500 - 312 * 2.25);
-    const y = maruFocus * (370 - 503 * 2) + ondolFocus * (370 - 447 * 2.25);
+    const scale = 1 + maruFocus * .85 + ondolFocus * 1.25;
+    const x = maruFocus * (500 - 700 * 1.85) + ondolFocus * (500 - 312 * 2.25);
+    const y = maruFocus * (370 - 503 * 1.85) + ondolFocus * (370 - 447 * 2.25);
     root.querySelector('#camera')?.setAttribute('transform', `translate(${x} ${y}) scale(${scale})`);
   }
 }
@@ -216,4 +224,4 @@ document.querySelectorAll('input[name="feature"]').forEach(input => {
 setSeason('summer');
 updatePauseControl();
 configureScenes();
-document.fonts.ready.then(() => configureScenes());
+document.fonts.ready.then(() => configureScenes(true));
